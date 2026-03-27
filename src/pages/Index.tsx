@@ -48,6 +48,7 @@ const Index = () => {
           <FishChart data={data?.chartData ?? []} isLoading={isLoading} />
         </div>
       </div>
+      <div className="pb-12" />
     </div>
   );
 };
