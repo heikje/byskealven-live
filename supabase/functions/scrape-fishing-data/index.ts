@@ -289,6 +289,11 @@ Deno.serve(async (req) => {
     errors.push(`Videos: ${e instanceof Error ? e.message : 'Unknown error'}`);
   }
 
+  // Merge water temp from chart into river data
+  if (river && waterTempFromChart !== null) {
+    river.waterTemp = waterTempFromChart;
+  }
+
   const result = {
     fish,
     snow,
