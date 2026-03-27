@@ -84,18 +84,30 @@ function parseSnowHtml(html: string) {
   return { depth: depth!, unit: "cm" };
 }
 
-function parseChartJson(rawJson: string) {
+function parseChartJson(rawJson: string): { chartData: Array<{ date: string; net: number }>; waterTemp: number | null } {
   try {
     const series = JSON.parse(rawJson);
     const netSeries = series.find((s: { name: string }) => s.name === "Netto");
-    if (!netSeries?.data) return [];
-    
-    return netSeries.data.map(([ts, val]: [number, number]) => ({
-      date: new Date(ts).toLocaleDateString("sv-SE", { month: "short", day: "numeric" }),
-      net: val,
-    }));
+    const chartData = netSeries?.data
+      ? netSeries.data.map(([ts, val]: [number, number]) => ({
+          date: new Date(ts).toLocaleDateString("sv-SE", { month: "short", day: "numeric" }),
+          net: val,
+        }))
+      : [];
+
+    // Extract latest water temperature
+    const tempSeries = series.find((s: { name: string }) => s.name === "Vattentemperatur");
+    let waterTemp: number | null = null;
+    if (tempSeries?.data?.length) {
+      const lastPoint = tempSeries.data[tempSeries.data.length - 1];
+      if (Array.isArray(lastPoint) && Number.isFinite(lastPoint[1])) {
+        waterTemp = lastPoint[1];
+      }
+    }
+
+    return { chartData, waterTemp };
   } catch {
-    return [];
+    return { chartData: [], waterTemp: null };
   }
 }
 
@@ -149,6 +161,7 @@ Deno.serve(async (req) => {
   let river = null;
   let videos: Array<{ dateTime: string; species: string; direction: string; length: number; thumb: string; video: string }> = [];
   let chartData: Array<{ date: string; net: number }> = [];
+  let waterTempFromChart: number | null = null;
 
   // Scrape fish data
   try {
@@ -213,7 +226,9 @@ Deno.serve(async (req) => {
     );
     if (chartRes.ok) {
       const chartText = await chartRes.text();
-      chartData = parseChartJson(chartText);
+      const parsed = parseChartJson(chartText);
+      chartData = parsed.chartData;
+      waterTempFromChart = parsed.waterTemp;
     } else {
       errors.push("Chart: HTTP " + chartRes.status);
     }
@@ -272,6 +287,11 @@ Deno.serve(async (req) => {
     }
   } catch (e) {
     errors.push(`Videos: ${e instanceof Error ? e.message : 'Unknown error'}`);
+  }
+
+  // Merge water temp from chart into river data
+  if (river && waterTempFromChart !== null) {
+    river.waterTemp = waterTempFromChart;
   }
 
   const result = {
