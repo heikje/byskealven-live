@@ -99,6 +99,37 @@ function parseChartJson(rawJson: string) {
   }
 }
 
+function parseRiverMarkdown(markdown: string) {
+  let streamflow: number | null = null;
+  let riverStage: number | null = null;
+  let waterTemp: number | null = null;
+
+  // Streamflow: 58m³/s
+  const flowMatch = markdown.match(/Streamflow[:\s]*(\d+(?:[.,]\d+)?)\s*m[³3]\/s/i);
+  if (flowMatch) streamflow = parseFloat(flowMatch[1].replace(',', '.'));
+
+  // River stage: 105.447cm
+  const stageMatch = markdown.match(/River stage[:\s]*(\d+(?:[.,]\d+)?)\s*cm/i);
+  if (stageMatch) riverStage = parseFloat(stageMatch[1].replace(',', '.'));
+
+  // Water temp (may or may not exist)
+  const tempMatch = markdown.match(/(?:Water\s*temp|Temperature)[:\s]*(\d+(?:[.,]\d+)?)\s*°?C/i);
+  if (tempMatch) waterTemp = parseFloat(tempMatch[1].replace(',', '.'));
+
+  if (streamflow === null && riverStage === null) {
+    throw new Error("No river data found");
+  }
+
+  return {
+    streamflow,
+    streamflowUnit: "m³/s",
+    riverStage,
+    riverStageUnit: "cm",
+    waterTemp,
+    waterTempUnit: "°C",
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -115,6 +146,7 @@ Deno.serve(async (req) => {
   const errors: string[] = [];
   let fish = null;
   let snow = null;
+  let river = null;
   let chartData: Array<{ date: string; net: number }> = [];
 
   // Scrape fish data
@@ -188,9 +220,35 @@ Deno.serve(async (req) => {
     errors.push(`Chart: ${e instanceof Error ? e.message : 'Unknown error'}`);
   }
 
+  // Scrape river conditions from riverapp.net
+  try {
+    const riverRes = await fetch('https://api.firecrawl.dev/v1/scrape', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: 'https://www.riverapp.net/en/station/5e2ca485473f4b7bee591672',
+        formats: ['markdown'],
+        waitFor: 3000,
+      }),
+    });
+    const riverData = await riverRes.json();
+    const md = riverData?.data?.markdown || riverData?.markdown;
+    if (md) {
+      river = parseRiverMarkdown(md);
+    } else {
+      errors.push("River: No markdown returned from scrape");
+    }
+  } catch (e) {
+    errors.push(`River: ${e instanceof Error ? e.message : 'Unknown error'}`);
+  }
+
   const result = {
     fish,
     snow,
+    river,
     chartData,
     lastUpdated: new Date().toISOString(),
     errors,
