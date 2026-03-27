@@ -157,7 +157,6 @@ Deno.serve(async (req) => {
 
   const errors: string[] = [];
   let fish = null;
-  let snow = null;
   let river = null;
   let videos: Array<{ dateTime: string; species: string; direction: string; length: number; thumb: string; video: string }> = [];
   let chartData: Array<{ date: string; net: number }> = [];
@@ -186,31 +185,6 @@ Deno.serve(async (req) => {
     }
   } catch (e) {
     errors.push(`Fish: ${e instanceof Error ? e.message : 'Unknown error'}`);
-  }
-
-  // Scrape snow data
-  try {
-    const snowRes = await fetch('https://api.firecrawl.dev/v1/scrape', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: 'https://www.smhi.se/vader/observationer/snodjup',
-        formats: ['html'],
-        waitFor: 3000,
-      }),
-    });
-    const snowData = await snowRes.json();
-    const html = snowData?.data?.html || snowData?.html;
-    if (html) {
-      snow = parseSnowHtml(html);
-    } else {
-      errors.push("Snow: No HTML returned from scrape");
-    }
-  } catch (e) {
-    errors.push(`Snow: ${e instanceof Error ? e.message : 'Unknown error'}`);
   }
 
   // Fetch chart data directly (it's a public JSON endpoint)
