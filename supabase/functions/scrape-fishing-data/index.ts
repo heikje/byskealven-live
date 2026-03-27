@@ -161,6 +161,7 @@ Deno.serve(async (req) => {
   let river = null;
   let videos: Array<{ dateTime: string; species: string; direction: string; length: number; thumb: string; video: string }> = [];
   let chartData: Array<{ date: string; net: number }> = [];
+  let waterTempFromChart: number | null = null;
 
   // Scrape fish data
   try {
@@ -225,7 +226,9 @@ Deno.serve(async (req) => {
     );
     if (chartRes.ok) {
       const chartText = await chartRes.text();
-      chartData = parseChartJson(chartText);
+      const parsed = parseChartJson(chartText);
+      chartData = parsed.chartData;
+      waterTempFromChart = parsed.waterTemp;
     } else {
       errors.push("Chart: HTTP " + chartRes.status);
     }
