@@ -270,7 +270,6 @@ Deno.serve(async (req) => {
 
   const result = {
     fish,
-    snow,
     river,
     videos,
     chartData,
