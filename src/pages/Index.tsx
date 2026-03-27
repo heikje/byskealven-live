@@ -3,6 +3,7 @@ import { fetchDashboardData } from "@/lib/api/fishing-data";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { FishCounterCard } from "@/components/FishCounterCard";
 import { SnowDepthCard } from "@/components/SnowDepthCard";
+import { RiverConditionsCard } from "@/components/RiverConditionsCard";
 import riverHero from "@/assets/river-hero.jpg";
 import { FishChart } from "@/components/FishChart";
 import { StatusIndicator } from "@/components/StatusIndicator";
@@ -42,6 +43,10 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
           <FishCounterCard data={data?.fish ?? null} isLoading={isLoading} />
           <SnowDepthCard data={data?.snow ?? null} isLoading={isLoading} />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 mt-4">
+          <RiverConditionsCard data={data?.river ?? null} isLoading={isLoading} />
         </div>
 
         <div className="mt-4">

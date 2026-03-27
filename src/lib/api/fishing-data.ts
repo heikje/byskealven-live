@@ -15,9 +15,19 @@ export interface SnowData {
   unit: string;
 }
 
+export interface RiverData {
+  streamflow: number | null;
+  streamflowUnit: string;
+  riverStage: number | null;
+  riverStageUnit: string;
+  waterTemp: number | null;
+  waterTempUnit: string;
+}
+
 export interface DashboardData {
   fish: FishData | null;
   snow: SnowData | null;
+  river: RiverData | null;
   chartData: Array<{ date: string; net: number }>;
   lastUpdated: string;
   errors: string[];
