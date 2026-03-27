@@ -3,6 +3,7 @@ import { fetchDashboardData } from "@/lib/api/fishing-data";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { FishCounterCard } from "@/components/FishCounterCard";
 import { SnowDepthCard } from "@/components/SnowDepthCard";
+import riverHero from "@/assets/river-hero.jpg";
 import { FishChart } from "@/components/FishChart";
 import { StatusIndicator } from "@/components/StatusIndicator";
 
@@ -16,8 +17,20 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background">
+      {/* Hero banner */}
+      <div className="relative h-48 sm:h-56 overflow-hidden">
+        <img
+          src={riverHero}
+          alt="Byskeälven river"
+          className="w-full h-full object-cover"
+          width={1920}
+          height={640}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/60 to-background" />
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
         <DashboardHeader
           lastUpdated={dataUpdatedAt ? new Date(dataUpdatedAt).toISOString() : null}
           isLoading={isLoading}
