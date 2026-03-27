@@ -6,6 +6,7 @@ import { SnowDepthCard } from "@/components/SnowDepthCard";
 import { RiverConditionsCard } from "@/components/RiverConditionsCard";
 import riverHero from "@/assets/river-hero.jpg";
 import { FishChart } from "@/components/FishChart";
+import { FishVideosCard } from "@/components/FishVideosCard";
 import { StatusIndicator } from "@/components/StatusIndicator";
 
 const Index = () => {
@@ -51,6 +52,10 @@ const Index = () => {
 
         <div className="mt-4">
           <FishChart data={data?.chartData ?? []} isLoading={isLoading} />
+        </div>
+
+        <div className="mt-4">
+          <FishVideosCard videos={data?.videos ?? []} isLoading={isLoading} />
         </div>
       </div>
       <div className="pb-12" />

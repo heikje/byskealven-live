@@ -147,6 +147,7 @@ Deno.serve(async (req) => {
   let fish = null;
   let snow = null;
   let river = null;
+  let videos: Array<{ dateTime: string; species: string; direction: string; length: number; thumb: string; video: string }> = [];
   let chartData: Array<{ date: string; net: number }> = [];
 
   // Scrape fish data
@@ -245,10 +246,39 @@ Deno.serve(async (req) => {
     errors.push(`River: ${e instanceof Error ? e.message : 'Unknown error'}`);
   }
 
+  // Fetch latest videos (public JSON endpoint, no Firecrawl needed)
+  try {
+    const vidRes = await fetch(
+      'https://fiskdata.se/raknare/live/ajax/loadVideos.php?counterId=670&counterYear=2025&urval=0',
+      {
+        headers: {
+          'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'accept': 'application/json',
+        },
+      }
+    );
+    if (vidRes.ok) {
+      const vidJson = await vidRes.json();
+      videos = (vidJson || []).slice(0, 6).map((v: Record<string, unknown>) => ({
+        dateTime: v.DateTime as string,
+        species: v.NameSv as string,
+        direction: (v.Dir as number) === 1 ? 'up' : 'down',
+        length: v.Length_calc as number,
+        thumb: `https://fiskdata.se${v.thumb}`,
+        video: `https://fiskdata.se${v.video}`,
+      }));
+    } else {
+      errors.push("Videos: HTTP " + vidRes.status);
+    }
+  } catch (e) {
+    errors.push(`Videos: ${e instanceof Error ? e.message : 'Unknown error'}`);
+  }
+
   const result = {
     fish,
     snow,
     river,
+    videos,
     chartData,
     lastUpdated: new Date().toISOString(),
     errors,

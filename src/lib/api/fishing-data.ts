@@ -24,10 +24,20 @@ export interface RiverData {
   waterTempUnit: string;
 }
 
+export interface VideoData {
+  dateTime: string;
+  species: string;
+  direction: string;
+  length: number;
+  thumb: string;
+  video: string;
+}
+
 export interface DashboardData {
   fish: FishData | null;
   snow: SnowData | null;
   river: RiverData | null;
+  videos: VideoData[];
   chartData: Array<{ date: string; net: number }>;
   lastUpdated: string;
   errors: string[];
