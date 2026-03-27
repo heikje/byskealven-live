@@ -1,13 +1,7 @@
-import { Snowflake } from "lucide-react";
+import { Snowflake, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
-import type { SnowData } from "@/lib/api/fishing-data";
 
-interface SnowDepthCardProps {
-  data: SnowData | null;
-  isLoading: boolean;
-}
-
-export const SnowDepthCard = ({ data, isLoading }: SnowDepthCardProps) => {
+export const SnowDepthCard = () => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -25,21 +19,20 @@ export const SnowDepthCard = ({ data, isLoading }: SnowDepthCardProps) => {
         </span>
       </div>
 
-      {isLoading ? (
-        <div className="h-20 bg-muted rounded-lg animate-pulse" />
-      ) : data ? (
-        <div className="text-center py-4">
-          <p className="text-5xl font-bold text-snow font-mono">
-            {data.depth}
-          </p>
-          <p className="text-muted-foreground text-sm mt-1">{data.unit}</p>
-          <p className="text-xs text-muted-foreground mt-3">Latest reported depth</p>
-        </div>
-      ) : (
-        <p className="text-muted-foreground text-center py-8">No data available</p>
-      )}
-
-      <p className="text-[10px] text-muted-foreground mt-4">Source: smhi.se</p>
+      <div className="text-center py-6">
+        <p className="text-muted-foreground text-sm mb-4">
+          Check current snow depth observations on SMHI
+        </p>
+        <a
+          href="https://www.smhi.se/vader/observationer/snodjup"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+        >
+          View on smhi.se
+          <ExternalLink className="h-3.5 w-3.5" />
+        </a>
+      </div>
     </motion.div>
   );
 };
