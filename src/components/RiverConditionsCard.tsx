@@ -64,7 +64,7 @@ export const RiverConditionsCard = ({ data, isLoading }: RiverConditionsCardProp
         <p className="text-muted-foreground text-center py-8">No data available</p>
       )}
 
-      <p className="text-[10px] text-muted-foreground mt-4">Source: riverapp.net / SMHI</p>
+      <a href="https://www.riverapp.net/en/station/5e2ca485473f4b7bee591672" target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground hover:text-primary transition-colors mt-4 inline-flex items-center gap-1">Source: riverapp.net / SMHI ↗</a>
     </motion.div>
   );
 };

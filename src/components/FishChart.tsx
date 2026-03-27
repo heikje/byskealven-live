@@ -68,7 +68,7 @@ export const FishChart = ({ data, isLoading }: FishChartProps) => {
         <p className="text-muted-foreground text-center py-12">No chart data available</p>
       )}
 
-      <p className="text-[10px] text-muted-foreground mt-2">Source: fiskdata.se</p>
+      <a href="https://fiskdata.se/raknare/live/live.php?locationId=17" target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground hover:text-primary transition-colors mt-2 inline-flex items-center gap-1">Source: fiskdata.se ↗</a>
     </motion.div>
   );
 };

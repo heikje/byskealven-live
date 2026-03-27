@@ -91,7 +91,7 @@ export const FishVideosCard = ({ videos, isLoading }: FishVideosCardProps) => {
         <p className="text-muted-foreground text-center py-8">No videos available</p>
       )}
 
-      <p className="text-[10px] text-muted-foreground mt-4">Source: fiskdata.se</p>
+      <a href="https://fiskdata.se/raknare/live/live.php?locationId=17" target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground hover:text-primary transition-colors mt-4 inline-flex items-center gap-1">Source: fiskdata.se ↗</a>
     </motion.div>
   );
 };
