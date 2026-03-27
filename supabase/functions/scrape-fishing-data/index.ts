@@ -84,18 +84,30 @@ function parseSnowHtml(html: string) {
   return { depth: depth!, unit: "cm" };
 }
 
-function parseChartJson(rawJson: string) {
+function parseChartJson(rawJson: string): { chartData: Array<{ date: string; net: number }>; waterTemp: number | null } {
   try {
     const series = JSON.parse(rawJson);
     const netSeries = series.find((s: { name: string }) => s.name === "Netto");
-    if (!netSeries?.data) return [];
-    
-    return netSeries.data.map(([ts, val]: [number, number]) => ({
-      date: new Date(ts).toLocaleDateString("sv-SE", { month: "short", day: "numeric" }),
-      net: val,
-    }));
+    const chartData = netSeries?.data
+      ? netSeries.data.map(([ts, val]: [number, number]) => ({
+          date: new Date(ts).toLocaleDateString("sv-SE", { month: "short", day: "numeric" }),
+          net: val,
+        }))
+      : [];
+
+    // Extract latest water temperature
+    const tempSeries = series.find((s: { name: string }) => s.name === "Vattentemperatur");
+    let waterTemp: number | null = null;
+    if (tempSeries?.data?.length) {
+      const lastPoint = tempSeries.data[tempSeries.data.length - 1];
+      if (Array.isArray(lastPoint) && Number.isFinite(lastPoint[1])) {
+        waterTemp = lastPoint[1];
+      }
+    }
+
+    return { chartData, waterTemp };
   } catch {
-    return [];
+    return { chartData: [], waterTemp: null };
   }
 }
 
